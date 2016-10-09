@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Labyrinth — A-Frame</title>
+    <meta name="description" content="Labyrinth — A-Frame">
+    <script src="aframe.js"></script>
+    <script src="aframe-extras.physics.js"></script>
+    <script src="https://rawgit.com/ngokevin/aframe-text-component/master/dist/aframe-text-component.min.js"></script>
+    
+  </head>
+  <body>
+    <a-scene physics id="scene">
+      <a-entity static-body velocity="0 0 0" rotation="0 0 0" id="camera" geometry="primitive:sphere;radius:1.5" camera="userHeight: 1.6" position="0.5 0 -0.5" kinematic-body wasd-controls look-controls></a-entity>
+
+      <a-entity text="text: Hello"></a-entity>
+
+      <a-plane static-body height="21" width="21" rotation="-90 0 0" position="-0.5 0 -0.5" material="src: url(ground.jpg);side: double;repeat: 6 6"></a-plane>
+      <a-plane static-body height="21" width="21" rotation="-90 0 0" position="-0.5 3 -0.5" material="src: url(roof.jpg);side: double;repeat: 7 7"></a-plane>
+      <a-plane static-body height="3" width="21" rotation="0 90 0" position="-11 1.5 -0.5" material="src: url(wall.jpg);side: double;repeat: 7 1"></a-plane>
+      <a-plane static-body height="3" width="21" rotation="0 90 0" position="10 1.5 -0.5" material="src: url(wall.jpg);side: double;repeat: 7 1"></a-plane>
+      <a-plane static-body height="3" width="21" rotation="0 0 0" position="-0.5 1.5 10" material="src: url(wall.jpg);side: double;repeat: 7 1"></a-plane>
+      <a-plane static-body height="3" width="21" rotation="0 0 0" position="-0.5 1.5 -11" material="src: url(wall.jpg);side: double;repeat: 7 1"></a-plane>
+
+
+      <a-plane static-body height="3" width="8" rotation="0 0 0" position="3 1.5 7" material="src: url(wall.jpg);side: double;repeat: 2.667 1"></a-plane>
+      <a-plane static-body height="3" width="9" rotation="0 0 0" position="2.5 1.5 -2" material="src: url(wall.jpg);side: double;repeat: 3 1"></a-plane>
+      <a-plane static-body height="3" width="6" rotation="0 0 0" position="4 1.5 -8" material="src: url(wall.jpg);side: double;repeat: 2 1"></a-plane>
+      <a-plane static-body height="3" width="8" rotation="0 0 0" position="3 1.5 7" material="src: url(wall.jpg);side: double;repeat: 2.667 1"></a-plane>
+      <a-plane static-body height="3" width="3" rotation="0 0 0" position="8.5 1.5 4" material="src: url(wall.jpg);side: double;repeat: 1 1"></a-plane>
+      <a-plane static-body height="3" width="15" rotation="0 0 0" position="-3.5 1.5 4" material="src: url(wall.jpg);side: double;repeat: 5 1"></a-plane>
+      <a-plane static-body height="3" width="8" rotation="0 0 0" position="6 1.5 1" material="src: url(wall.jpg);side: double;repeat: 2.667 1"></a-plane>
+      <a-plane static-body height="3" width="6" rotation="0 0 0" position="-4 1.5 1" material="src: url(wall.jpg);side: double;repeat: 2 1"></a-plane>
+      <a-plane static-body height="3" width="7" rotation="0 0 0" position="-7.5 1.5 7" material="src: url(wall.jpg);side:;repeat: 2.333 1"></a-plane>
+      <a-plane static-body height="3" width="3" rotation="0 0 0" position="2.5 1.5 -5" material="src: url(wall.jpg);side:;repeat: 1 1"></a-plane>
+
+      <a-plane static-body height="3" width="3" rotation="0 90 0" position="-1 1.5 8.5" material="src: url(wall.jpg);side: double;repeat: 1 1"></a-plane>
+      <a-plane static-body height="3" width="6" rotation="0 90 0" position="-2 1.5 -5" material="src: url(wall.jpg);side: double;repeat: 2 1"></a-plane>
+      <a-plane static-body height="3" width="9" rotation="0 90 0" position="-5 1.5 -6.5" material="src: url(wall.jpg);side: double;repeat: 3 1"></a-plane>
+      <a-plane static-body height="3" width="6" rotation="0 90 0" position="-8 1.5 -5" material="src: url(wall.jpg);side: double;repeat: 2 1"></a-plane>
+      <a-plane static-body height="3" width="3" rotation="0 90 0" position="1 1.5 -6.5" material="src: url(wall.jpg);side: double;repeat: 1 1"></a-plane>
+      <a-plane static-body height="3" width="3" rotation="0 90 0" position="-1 1.5 -0.5" material="src: url(wall.jpg);side: double;repeat: 1 1"></a-plane>
+      <a-plane static-body height="3" width="6" rotation="0 90 0" position="7 1.5 -5" material="src: url(wall.jpg);side: double;repeat: 2 1"></a-plane>
+
+    </a-scene>
+
+    <script>
+        var cam = document.getElementById('camera');
+
+        cam.addEventListener('collide', function (e) {
+            console.log('Player has collided with body #' + e.detail.body.id);
+            cam.setAttribute('collided',1);
+
+            e.detail.target.el;  // Original entity (playerEl).
+            e.detail.body.el;    // Other entity, which playerEl touched.
+            e.detail.contact;    // Stats about the collision (CANNON.ContactEquation).
+            e.detail.contact.ni; // Normal (direction) of the collision (CANNON.Vec3).
+        });
+
+        function rotate(direction, callback){
+            var rotation = cam.getAttribute('rotation');
+            if(direction == 1){
+                rotation.y+=2;
+            }else if(direction == -1){
+                rotation.y-=2;
+            }
+
+            if(rotation.y == 360){
+                rotation.y = 0;
+            }
+            if(rotation.y%90 != 0){
+                setTimeout(function(){rotate(direction,callback)},20);
+            }else{
+                if(rotation.y < 0){
+                    rotation.y = 360 + rotation.y;
+                }
+                if(typeof callback != 'undefined'){
+                    callback();
+                }
+            }
+            cam.setAttribute('rotation', rotation);
+        }
+
+        function move(callback){
+            var collided = cam.getAttribute('collided');
+            if(typeof collided == 'undefined'){
+                collided = 0;
+            }
+            console.log(collided);
+            var position = cam.getAttribute('position');
+            var rotation = cam.getAttribute('rotation');
+            if(rotation.y == 0){
+                position.z-=.1;
+            }else if(rotation.y == 90){
+                position.x-=.1;
+            }else if(rotation.y == 180){
+                position.z+=.1;
+            }else if(rotation.y == 270){
+                position.x+=.1;
+            }
+            if(collided == 0){
+                setTimeout(function(){move(callback)},20);
+            }else{
+                cam.setAttribute('collided',0);
+                if(typeof callback != 'undefined'){
+                    callback();
+                }
+            }
+        }
+        function test(){
+            cam.setAttribute('collided',0);
+            rotate(-1,function(){
+                move(function(){
+                    rotate(1,function(){
+                        move(function(){
+                            rotate(1,function(){
+                                move();
+                            });
+                        });
+                    });
+                });
+            });
+        }
+        setTimeout(function(){test();},1500);
+    </script>
+
+  </body>
+</html>
