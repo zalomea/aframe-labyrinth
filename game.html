@@ -4,13 +4,21 @@
     <meta charset="utf-8">
     <title>Labyrinth game — A-Frame</title>
     <meta name="description" content="Labyrinth — A-Frame">
-    <script src="aframe.js"></script>
-    <script src="aframe-extras.js"></script>
-    <script src="https://rawgit.com/ngokevin/aframe-text-component/master/dist/aframe-text-component.min.js"></script>
+    <script src="libs/aframe.js"></script>
+    <script src="libs/aframe-extras.js"></script>
+    <script src="libs/aframe-text-component.min.js"></script>
     
+    <script src="src/common.js"></script>
+
   </head>
   <body>
     <a-scene physics id="scene">
+      <a-assets>
+        <img src="assets/wall.jpg" id="asset_wall">
+        <img src="assets/roof.jpg" id="asset_roof">
+        <img src="assets/ground.jpg" id="asset_ground">
+        <img src="assets/msg.jpg" id="asset_msg">
+      </a-assets>
       <a-entity static-body
                 velocity="0 0 0" 
                 rotation="0 0 0" 
@@ -18,8 +26,7 @@
                 id="camera" 
                 camera="" 
                 kinematic-body 
-                universal-controls 
-                look-controls>
+                universal-controls>
                   <a-entity text="text: Time;size:.03;height:0.001" material="color:#f00" position="-0.1 -0.7 -1" id="board"></a-entity>
                   <a-entity text="text: ;size:.1;height:0.001" material="color:#f0f" position="-0.3 0 -1" id="winner"></a-entity>
                 </a-entity>
@@ -27,209 +34,7 @@
     </a-scene>
     <script>
 
-    /* Aux functions */
-
-    function shuffle(a) {
-      var j, x, i;
-      for (i = a.length; i; i--) {
-        j = Math.floor(Math.random() * i);
-        x = a[i - 1];
-        a[i - 1] = a[j];
-        a[j] = x;
-      }
-    }
-
-
-    Array.prototype.repeat= function(what, L){
-     while(L) this[--L]= what;
-     return this;
-    }
     var maze;
-
-    var width = 14,
-        height = 18;
-
-    /* Maze functions */
-
-    function buildPath(pos){
-      var neighbor = [];
-      maze[pos[0]][pos[1]] = 1;
-      if(pos[0] > 0) neighbor.push([pos[0]-1,pos[1]  ]);
-      if(pos[1] > 0) neighbor.push([pos[0]  ,pos[1]-1]);
-      if(pos[0] < maze.length-1)    neighbor.push([pos[0]+1,pos[1]  ]);
-      if(pos[1] < maze[0].length-1) neighbor.push([pos[0]  ,pos[1]+1]);
-
-      shuffle(neighbor);
-
-      for (var i = neighbor.length - 1; i >= 0; i--) {
-
-        if(maze[neighbor[i][0]][neighbor[i][1]] == 0 && countNeighbors(neighbor[i]) == 1){
-          buildPath(neighbor[i]);
-        }
-      }
-    }
-
-    function countNeighbors(pos){
-      var res = 0;
-      if(pos[0] > 0 && maze[pos[0]-1][pos[1]] == 1){
-        res++;
-      }
-      if(pos[1] > 0 && maze[pos[0]][pos[1]-1] == 1){
-        res++;
-      }
-      if(pos[0] < maze.length-1 && maze[pos[0]+1][pos[1]] == 1){
-        res++;
-      }
-      if(pos[1] < maze[0].length-1 && maze[pos[0]][pos[1]+1] == 1){
-        res++;
-      }
-      return res;
-    }
-
-    /* Graphics functions */
-
-    function paintMaze(){
-      var maze_height = maze.length;
-      var maze_width = maze[0].length;
-
-      var scene = document.getElementById('scene');
-
-      var aplanes = document.getElementsByTagName('a-plane');
-      for (var i = aplanes.length - 1; i >= 0; i--) {
-        scene.remove(aplanes[i]);
-      }
-      var aboxes = document.getElementsByTagName('a-box');
-      for (var i = aboxes.length - 1; i >= 0; i--) {
-        scene.remove(aboxes[i]);
-      }
-
-      var plane_ground = document.createElement("a-plane");
-      plane_ground.setAttribute('static-body','');
-      plane_ground.setAttribute('height',3*maze_height);
-      plane_ground.setAttribute('width',3*maze_width);
-      plane_ground.setAttribute('position','0 0 0');
-      plane_ground.setAttribute('rotation','90 0 0');
-      plane_ground.setAttribute('material','src: url(ground.jpg);side: double;repeat: '+maze[0].length+' '+maze.length);
-
-      scene.appendChild(plane_ground);
-
-      var plane_roof = document.createElement("a-plane");
-      plane_roof.setAttribute('static-body','');
-      plane_roof.setAttribute('height',3*maze_height);
-      plane_roof.setAttribute('width',3*maze_width);
-      plane_roof.setAttribute('position','0 3 0');
-      plane_roof.setAttribute('rotation','90 0 0');
-      plane_roof.setAttribute('material','src: url(roof.jpg);side: double;repeat: '+maze[0].length+' '+maze.length);
-
-      scene.appendChild(plane_roof);
-
-      var plane_wall = document.createElement("a-plane");
-      plane_wall.setAttribute('static-body','');
-      plane_wall.setAttribute('height',3);
-      plane_wall.setAttribute('width',3*maze_width);
-      plane_wall.setAttribute('position','0 1.5 '+(3*((maze_height)*.5)));
-      plane_wall.setAttribute('rotation','0 0 0');
-      plane_wall.setAttribute('material','src: url(wall.jpg);side: double;repeat: '+maze[0].length+' 1');
-
-      scene.appendChild(plane_wall);
-
-      plane_wall = document.createElement("a-plane");
-      plane_wall.setAttribute('static-body','');
-      plane_wall.setAttribute('height',3);
-      plane_wall.setAttribute('width',3*maze_width);
-      plane_wall.setAttribute('position','0 1.5 -'+(3*((maze_height)*.5)));
-      plane_wall.setAttribute('rotation','0 0 0');
-      plane_wall.setAttribute('material','src: url(wall.jpg);side: double;repeat: '+maze[0].length+' 1');
-
-      scene.appendChild(plane_wall);
-
-      plane_wall = document.createElement("a-plane");
-      plane_wall.setAttribute('static-body','');
-      plane_wall.setAttribute('height',3);
-      plane_wall.setAttribute('width',3*maze_height);
-      plane_wall.setAttribute('position',(3*((maze_width)*.5))+' 1.5 0');
-      plane_wall.setAttribute('rotation','0 90 0');
-      plane_wall.setAttribute('material','src: url(wall.jpg);side: double;repeat: '+maze.length+' 1');
-
-      scene.appendChild(plane_wall);
-
-      plane_wall = document.createElement("a-plane");
-      plane_wall.setAttribute('static-body','');
-      plane_wall.setAttribute('height',3);
-      plane_wall.setAttribute('width',3*maze_height);
-      plane_wall.setAttribute('position',(-3*((maze_width)*.5))+' 1.5 0');
-      plane_wall.setAttribute('rotation','0 90 0');
-      plane_wall.setAttribute('material','src: url(wall.jpg);side: double;repeat: '+maze.length+' 1');
-
-      scene.appendChild(plane_wall);
-
-      var free1=0,free2=0;
-      while(maze[free1][free2] != 1){
-        free1++;
-        if(free1 >= width){
-          free1 = 0;
-          free2++;
-        }
-      }
-      cam.setAttribute('position',(3*(free2-(maze_width-1)*.5))+' 1.6 '+(3*(free1-(maze_height-1)*.5)));
-
-      var plane_instructions = document.createElement("a-plane");
-      plane_instructions.setAttribute('height',1.5);
-      plane_instructions.setAttribute('width',3);
-      plane_instructions.setAttribute('look-at','#camera');
-      plane_instructions.setAttribute('rotation','0 90 0');
-      plane_instructions.setAttribute('position',(3*(free2-(maze_width-1)*.5))+' 1 '+(3*(free1-(maze_height-1)*.5)));
-      plane_instructions.setAttribute('material','src: url(msg.jpg);side: double;repeat: 1 1');
-
-      scene.appendChild(plane_instructions);
-
-      var free1=width-1,free2=height-1;
-      while(maze[free1][free2] != 1){
-        free1--;
-        if(free1 <= 0){
-          free1 = width-1;
-          free2--;
-        }
-      }
-      var box_price = document.createElement("a-box");
-          box_price.setAttribute('dynamic-body','');
-          box_price.setAttribute('id','price');
-          box_price.setAttribute('height',1);
-          box_price.setAttribute('width',1);
-          box_price.setAttribute('depth',1);
-          box_price.setAttribute('rotation','45 45 45');
-          box_price.setAttribute('position',(3*(free2-(maze_width-1)*.5))+' 1 '+(3*(free1-(maze_height-1)*.5)));
-          box_price.setAttribute('color','#00f');
-      /*
-      var animation_price = document.createElement('a-animation');
-          animation_price.setAttribute('attribute','rotation');
-          animation_price.setAttribute('from','45 0 45');
-          animation_price.setAttribute('to','45 360 45');
-          animation_price.setAttribute('dur','5000');
-          animation_price.setAttribute('delay','0');
-          animation_price.setAttribute('repeat','indefinite');
-
-          box_price.appendChild(animation_price);
-      */
-          scene.appendChild(box_price);
-
-      for(var i = 0; i < maze_height; i++){
-        for(var j = 0; j < maze_width; j++){
-          if(maze[i][j] == 1){
-            continue;
-          }
-          var box_wall = document.createElement("a-box");
-          box_wall.setAttribute('static-body','');
-          box_wall.setAttribute('height',3);
-          box_wall.setAttribute('width',3);
-          box_wall.setAttribute('depth',3);
-          box_wall.setAttribute('position',(3*(j-(maze_width-1)*.5))+' 1.5 '+(3*(i-(maze_height-1)*.5)));
-          box_wall.setAttribute('material','src: url(wall.jpg)');
-
-          scene.appendChild(box_wall);
-        }
-      }
-    }
 
     var cam = document.getElementById('camera');
     cam.addEventListener('collide', function (e) {
@@ -246,15 +51,15 @@
     var seconds = 0;
     var counter;
 
-    function init(){
+    function init(height,width){
       clearInterval(counter);
       maze = new Array(width);
       for (var i = 0; i < maze.length; i++){
         maze[i] = [].repeat(0, height);
       }
 
-      buildPath([0,0]);
-      paintMaze();
+      buildPath(maze,[0,0]);
+      paintMaze(maze);
       seconds = 0;
       counter = setInterval(function(){
         var board = document.getElementById('board');
@@ -263,7 +68,7 @@
         board.setAttribute('text', attr_text);
       },1000);
     }
-    init();
+    init(14,18);
 
 
     </script>
