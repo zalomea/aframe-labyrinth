@@ -1,27 +1,24 @@
 
     /* Aux functions */
 
-    function shuffle(a) {
-      var j, x, i;
-      for (i = a.length; i; i--) {
-        j = Math.floor(Math.random() * i);
-        x = a[i - 1];
-        a[i - 1] = a[j];
-        a[j] = x;
-      }
-    }
-
 
     Array.prototype.repeat= function(what, L){
      while(L) this[--L]= what;
      return this;
     }
+    String.prototype.replaceArray = function(find, replace) {
+      var replaceString = this;
+      for (var i = 0; i < find.length; i++) {
+        replaceString = replaceString.replace(find[i], replace[i]);
+      }
+      return replaceString;
+    };
 
     var QueryString = function () {
       // This function is anonymous, is executed immediately and 
       // the return value is assigned to QueryString!
       var query_string = {};
-      var query = window.location.search.substring(1);
+      var query = window.location.hash.substring(1);
       var vars = query.split("&");
       for (var i=0;i<vars.length;i++) {
         var pair = vars[i].split("=");
@@ -39,6 +36,20 @@
       } 
       return query_string;
     }();
+
+    function cyph(str){
+      return str.replace()
+    }
+
+    function shuffle(a) {
+      var j, x, i;
+      for (i = a.length; i; i--) {
+        j = Math.floor(Math.random() * i);
+        x = a[i - 1];
+        a[i - 1] = a[j];
+        a[j] = x;
+      }
+    }
 
     /* Maze functions */
 

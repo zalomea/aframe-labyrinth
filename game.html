@@ -7,6 +7,7 @@
     <script src="libs/aframe.js"></script>
     <script src="libs/aframe-extras.js"></script>
     <script src="libs/aframe-text-component.min.js"></script>
+    <script src="libs/lz-string.min.js"></script>
     
     <script src="src/common.js"></script>
 
@@ -53,12 +54,17 @@
 
     function init(width,height){
       clearInterval(counter);
-      maze = new Array(height);
+      maze = new Array(parseInt(height));
       for (var i = 0; i < maze.length; i++){
         maze[i] = [].repeat(0, width);
       }
 
       buildPath(maze,[0,0]);
+      if(typeof QueryString.maze == 'undefined'){
+        window.location.hash += '&maze='+LZString.compressToBase64(JSON.stringify(maze));
+      }else{
+        maze = JSON.parse(LZString.decompressFromBase64(QueryString.maze))
+      }
       paintMaze(maze);
       seconds = 0;
       counter = setInterval(function(){
@@ -68,7 +74,7 @@
         board.setAttribute('text', attr_text);
       },1000);
     }
-    
+
     var width = QueryString.width;
     var height = QueryString.height;
     if(typeof width == 'undefined'){
