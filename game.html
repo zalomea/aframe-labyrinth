@@ -51,11 +51,11 @@
     var seconds = 0;
     var counter;
 
-    function init(height,width){
+    function init(width,height){
       clearInterval(counter);
-      maze = new Array(width);
+      maze = new Array(height);
       for (var i = 0; i < maze.length; i++){
-        maze[i] = [].repeat(0, height);
+        maze[i] = [].repeat(0, width);
       }
 
       buildPath(maze,[0,0]);
@@ -68,7 +68,16 @@
         board.setAttribute('text', attr_text);
       },1000);
     }
-    init(14,18);
+    
+    var width = QueryString.width;
+    var height = QueryString.height;
+    if(typeof width == 'undefined'){
+      width = 18;
+    }
+    if(typeof height == 'undefined'){
+      height = 14;
+    }
+    init(width,height);
 
 
     </script>
